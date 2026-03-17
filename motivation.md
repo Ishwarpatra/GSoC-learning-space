@@ -2,13 +2,13 @@
 <!-- Fill this in honestly. A few sentences per section is fine. -->
 
 ## Who I am
-<!-- Your background — what you study/work on, your programming experience, anything relevant. -->
+<!-- I am a Computer Science and Engineering undergrad at KIIT (Expected 2028). I am highly interested in simulation engines, system architecture, and performance benchmarking -->
 
 ## Why Mesa
-<!-- What drew you to Mesa specifically? Have you used it before? How did you find it? -->
+<!-- I was drawn to Mesa because of the 4.0 architecture update. The shift to an Agent-Centric API and the new ContinuousSpace module presents exciting computational challenges that align perfectly with my interest in high-performance Python-->
 
 ## What I want to learn
-<!-- What aspects of Mesa or ABM are you most interested in? What skills do you want to develop? -->
+<!-- I want to deeply understand how Mesa's spatial indexing works under heavy loads, specifically how to optimize dynamic agent creation and high-frequency neighbor searches in continuous environments. -->
 
 ## Where I want to go
-<!-- What's your goal with contributing to Mesa? What kind of contributions do you see yourself making? -->
+<!-- My goal is to become a long-term maintainer of the mesa-examples repository, ensuring that future researchers have "gold-standard", CI/CD-compliant templates for hard-science simulations (Physics/Chemistry/Biology) -->
