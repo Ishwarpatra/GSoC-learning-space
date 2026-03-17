@@ -25,14 +25,7 @@ class SimpleRandomActivation:
 # import agents with a fallback so the module works both as part of the
 # examples package and when the directory is added to sys.path (e.g. running
 # run.py directly).
-try:
-    from .agents import (  # here world model is created and we will add the agents in it
-        Predator,
-        Prey,
-    )
-except ImportError:
-    from agents import Predator, Prey  # type: ignore[import-not-found]  # running as script
-
+from agents import Predator, Prey
 
 class PredatorPreyModel(mesa.Model):
     "model duty is to simulate predator and prey behaviour in a continuous space"

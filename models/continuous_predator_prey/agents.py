@@ -49,8 +49,8 @@ class Prey(ContinuousSpaceAgent):
         dx = math.cos(angle) * self.speed
         dy = math.sin(angle) * self.speed
         # NEW POSITION  calculated
-        new_x = self.pos[0] + dx
-        new_y = self.pos[1] + dy
+        new_x = self.position[0] + dx
+        new_y = self.position[1] + dy
 
         new_pos = (new_x, new_y)
 
@@ -95,7 +95,7 @@ class Predator(ContinuousSpaceAgent):
         dx = math.cos(angle) * self.speed
         dy = math.sin(angle) * self.speed
 
-        new_pos = (self.pos[0] + dx, self.pos[1] + dy)
+        new_pos = (self.position[0] + dx, self.position[1] + dy)
         if self.model.space.torus:
             new_pos = self.model.space.torus_correct(new_pos)
         self.position = new_pos
