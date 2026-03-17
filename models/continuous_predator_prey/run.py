@@ -1,9 +1,6 @@
 # attempt to import the model by name; this works both when the
 # script is executed directly and when the package is imported by tests.
-try:
-    from model import PredatorPreyModel
-except ImportError:
-    from examples.continuous_predator_prey.model import PredatorPreyModel
+from model import PredatorPreyModel
 
 # here models initiated
 
