@@ -1,31 +1,8 @@
 import mesa
 from mesa.experimental.continuous_space import ContinuousSpace
 
+from .agents import Predator, Prey
 
-# simple replacement for Mesa 2-style RandomActivation scheduler; the
-# built-in scheduling API changed in Mesa 3.x, so we keep a minimal class
-# to retain compatibility with existing example code and data collector
-# lambdas that look at `schedule.agents`.
-class SimpleRandomActivation:
-    def __init__(self, model):
-        self.model = model
-        self.agents = []
-
-    def add(self, agent):
-        self.agents.append(agent)
-
-    def step(self):
-        # random activation order without modifying original list
-        order = list(self.agents)
-        self.model.random.shuffle(order)
-        for a in order:
-            a.step()
-
-
-# import agents with a fallback so the module works both as part of the
-# examples package and when the directory is added to sys.path (e.g. running
-# run.py directly).
-from agents import Predator, Prey
 
 class PredatorPreyModel(mesa.Model):
     "model duty is to simulate predator and prey behaviour in a continuous space"
@@ -59,55 +36,48 @@ class PredatorPreyModel(mesa.Model):
         dims = [(0, self.width), (0, self.height)]
         # pass the model's random number generator so the space is reproducible
         self.space = ContinuousSpace(dims, torus=True, random=self.random)
-        # use our simple scheduler that mirrors Mesa 2 behaviour
-        self.schedule = SimpleRandomActivation(
-            self
-        )  # it's a scheduler that randomly activates the agents in each step of the simulation
 
-        # creation of prey(objects of prey class)
+        # creation of prey (unique_id and scheduling is now automatic!)
         for _ in range(initial_prey):
             # need start with random coordinates for each prey
             x = self.random.uniform(0, self.width)
             y = self.random.uniform(0, self.height)
             pos = (x, y)
-            # get a fresh id and create the agent in the space
-            agent_id = self.next_id()
-            prey = Prey(agent_id, self.space, self, pos)
             # registration with model is automatic in ContinuousSpaceAgent.__init__
-            self.schedule.add(prey)
+            Prey(self.space, self, pos)
 
-        # creation of predators(objects of predator class)
+        # creation of predators
         for _ in range(initial_predators):
             # need start with random coordinates for each predator
             x = self.random.uniform(0, self.width)
             y = self.random.uniform(0, self.height)
             pos = (x, y)
-            agent_id = self.next_id()
-            predator = Predator(agent_id, self.space, self, pos)
-            self.schedule.add(predator)
+
+            # THE FIX: give them random starting energy so they don't instantly starve
+            # standard Agent-Based Modeling practice for survival
+            starting_energy = self.random.randint(1, 2 * self.predator_gain_from_food)
+
+            # pass the starting energy to the agent
+            Predator(self.space, self, pos, speed=1.5, energy=starting_energy)
 
         # it keeps track of no. of prey and predators in each step of the simulation for analysis and visualization purposes
-        self.data_collector = mesa.DataCollector(
+        self.datacollector = mesa.DataCollector(
             model_reporters={
                 "Prey": lambda m: sum(
-                    1 for a in m.schedule.agents if isinstance(a, Prey)
-                ),  # it's count the number of prey by checking instances of prey class in the schedule
+                    1 for a in m.agents if isinstance(a, Prey)
+                ),  # it's count the number of prey by checking instances of prey class in the agents
                 "Predators": lambda m: sum(
-                    1 for a in m.schedule.agents if isinstance(a, Predator)
-                ),  # it's count the number of predators by checking instances of predator class in the schedule
+                    1 for a in m.agents if isinstance(a, Predator)
+                ),  # it's count the number of predators by checking instances of predator class in the agents
             }
         )
 
     def step(self):
-        # advancing to next step,model need to collect data before the agents take their actions
-
-        self.data_collector.collect(
+        # advancing to next step, model need to collect data before the agents take their actions
+        self.datacollector.collect(
             self
         )  # collect the data for the current step of the simulation
-        self.schedule.step()  # it step all agents  during the scheduling process
-
-    def next_id(self):
-        """Return a new unique agent id (compatibility helper)."""
-        nid = getattr(self, "agent_id_counter", 1)
-        self.agent_id_counter = nid + 1
-        return nid
+        # Mesa 4.0 native agent activation (replaces the old scheduler)
+        self.agents.shuffle_do(
+            "step"
+        )  # it step all agents during the scheduling process
